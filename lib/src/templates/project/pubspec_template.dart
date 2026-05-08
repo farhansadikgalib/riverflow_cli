@@ -53,7 +53,6 @@ dev_dependencies:
   json_serializable: ^6.8.0
   riverpod_generator: ^2.4.0
   go_router_builder: ^2.6.1
-  flutter_gen_runner: ^5.5.0+1
 
   # Linting
   riverpod_lint: ^2.3.10

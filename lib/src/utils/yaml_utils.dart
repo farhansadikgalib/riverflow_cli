@@ -52,29 +52,4 @@ class YamlUtils {
     }
   }
 
-  /// Reads the riverflow.yaml configuration file.
-  static Map<String, dynamic> readConfig([String? projectPath]) {
-    final configPath = '${projectPath ?? "."}/riverflow.yaml';
-    final yaml = readYamlFile(configPath);
-    if (yaml == null) return <String, dynamic>{};
-    return _yamlToMap(yaml);
-  }
-
-  static Map<String, dynamic> _yamlToMap(YamlMap yaml) {
-    return yaml.map<String, dynamic>((dynamic key, dynamic value) {
-      if (value is YamlMap) {
-        return MapEntry(key.toString(), _yamlToMap(value));
-      }
-      if (value is YamlList) {
-        return MapEntry(
-          key.toString(),
-          value.map((dynamic e) {
-            if (e is YamlMap) return _yamlToMap(e);
-            return e;
-          }).toList(),
-        );
-      }
-      return MapEntry(key.toString(), value);
-    });
-  }
 }

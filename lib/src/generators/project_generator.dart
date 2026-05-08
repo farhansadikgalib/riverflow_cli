@@ -15,7 +15,6 @@ import 'package:riverflow_cli/src/templates/project/local_storage_template.dart'
 import 'package:riverflow_cli/src/templates/project/main_template.dart';
 import 'package:riverflow_cli/src/templates/project/print_log_template.dart';
 import 'package:riverflow_cli/src/templates/project/pubspec_template.dart';
-import 'package:riverflow_cli/src/templates/project/riverflow_yaml_template.dart';
 import 'package:riverflow_cli/src/utils/file_utils.dart';
 import 'package:riverflow_cli/src/utils/logger.dart';
 
@@ -129,7 +128,6 @@ class ProjectGenerator {
       // Root config
       'pubspec.yaml': pubspecTemplate(name),
       'analysis_options.yaml': analysisOptionsTemplate(),
-      'riverflow.yaml': riverflowYamlTemplate(name),
       '.env': '# Environment variables\n'
           'APP_VERSION=1.0.0\n'
           '# BASE_URL=https://api.example.com\n',
@@ -198,14 +196,43 @@ class ProjectGenerator {
 
     progress.complete('Project $name created successfully!');
 
+    // Run flutter pub get
+    if (!dryRun) {
+      final pubGetProgress = logger.progress('Running flutter pub get');
+      final pubGetResult = await Process.run(
+        'flutter',
+        ['pub', 'get'],
+        workingDirectory: projectDir,
+      );
+      if (pubGetResult.exitCode != 0) {
+        pubGetProgress.fail('flutter pub get failed');
+        logger.err(pubGetResult.stderr.toString());
+      } else {
+        pubGetProgress.complete('Dependencies installed!');
+      }
+    }
+
+    // Run build_runner
+    if (!dryRun) {
+      final buildProgress = logger.progress('Running build_runner');
+      final buildResult = await Process.run(
+        'dart',
+        ['run', 'build_runner', 'build', '--delete-conflicting-outputs'],
+        workingDirectory: projectDir,
+      );
+      if (buildResult.exitCode != 0) {
+        buildProgress.fail('build_runner failed');
+        logger.err(buildResult.stderr.toString());
+      } else {
+        buildProgress.complete('Code generation complete!');
+      }
+    }
+
     logger
       ..info('')
-      ..info('Next steps:')
+      ..info('Your project is ready! Run:')
       ..info('  cd $name')
-      ..info('  flutter pub get')
-      ..info(
-        '  dart run build_runner build --delete-conflicting-outputs',
-      )
+      ..info('  flutter run')
       ..info('');
   }
 }

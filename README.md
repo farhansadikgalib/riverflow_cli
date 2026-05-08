@@ -186,7 +186,6 @@ my_app/
 │
 ├── .env                                    # APP_VERSION, BASE_URL
 ├── assets/
-├── riverflow.yaml                          # CLI config
 └── pubspec.yaml
 ```
 

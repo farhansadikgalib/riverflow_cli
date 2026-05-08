@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.2] - 2026-05-08
+
+### Added
+
+- Auto-run `flutter pub get` and `build_runner build` after project creation.
+- Full dartdoc comments on all public API symbols (100% coverage).
+
+### Removed
+
+- `riverflow.yaml` config file — no longer needed.
+- `flutter_gen_runner` from generated projects (fixes dart_style version conflict breaking build_runner).
+
+### Changed
+
+- `build_runner` now always runs after code generation (no config check).
+- Post-creation message simplified to `cd <name>` + `flutter run`.
+
 ## [0.1.1] - 2026-05-08
 
 ### Added

@@ -12,7 +12,6 @@ import 'package:riverflow_cli/src/templates/project/di_template.dart';
 import 'package:riverflow_cli/src/templates/project/failure_template.dart';
 import 'package:riverflow_cli/src/templates/project/local_storage_template.dart';
 import 'package:riverflow_cli/src/templates/project/print_log_template.dart';
-import 'package:riverflow_cli/src/templates/project/riverflow_yaml_template.dart';
 import 'package:riverflow_cli/src/utils/file_utils.dart';
 import 'package:riverflow_cli/src/utils/logger.dart';
 
@@ -94,7 +93,6 @@ class InitCommand extends Command<int> {
         projectName,
       ),
       p.join('lib', 'core', 'theme', 'app_theme.dart'): appThemeTemplate(),
-      'riverflow.yaml': riverflowYamlTemplate(projectName),
     };
 
     for (final entry in files.entries) {
