@@ -1,0 +1,27 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [0.1.0] - 2026-05-08
+
+### Added
+
+- `riv create project:<name>` — Scaffold a complete Flutter project with Clean Architecture, Riverpod, Freezed, Go Router, and Dio.
+- `riv create page:<name>` — Generate a full feature module with domain, data, and presentation layers.
+- `riv create viewmodel:<name> on <module>` — Generate a Riverpod Notifier-based ViewModel with Freezed state.
+- `riv create view:<name> on <module>` — Generate a ConsumerWidget view with state.when() pattern matching.
+- `riv create provider:<name> on <module>` — Generate a Riverpod data provider.
+- `riv create screen:<name>` — Generate a responsive screen layout.
+- `riv generate model on <module> with <json>` — Generate a Freezed model from JSON.
+- `riv generate locales <path>` — Generate i18n translations from ARB files.
+- `riv init` — Convert an existing Flutter project to Riverflow structure.
+- `riv sort` — Sort and organize imports.
+- `riv install <package>` — Install Flutter packages.
+- `riv remove <package>` — Remove Flutter packages.
+- `riv update` — Self-update the CLI.
+- `--dry-run` flag for previewing changes.
+- Automatic route registration in `app_router.dart`.
+- `riverflow.yaml` configuration file support.
