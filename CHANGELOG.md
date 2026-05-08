@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.3] - 2026-05-08
+
+### Fixed
+
+- `appRouterProvider` not found — router now uses manual `Provider<GoRouter>` instead of `@riverpod` code gen.
+- `home_viewmodel.freezed.dart` / `.g.dart` not generated — home module now uses plain `Notifier` and `sealed class` instead of Freezed/riverpod_generator.
+- Home view uses Dart 3 `switch` expression instead of `.when()` pattern.
+- Route registration uses `GoRoute()` entries instead of `@TypedGoRoute` annotations.
+- Generated project now compiles and runs immediately without `build_runner`.
+
+### Removed
+
+- `.gitkeep` files from generated projects.
+
 ## [0.1.2] - 2026-05-08
 
 ### Added

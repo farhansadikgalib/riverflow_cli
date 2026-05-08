@@ -27,7 +27,7 @@ class RouteRegistrar {
     final className = moduleName.singular.pascalCase;
     final snakeName = moduleName.singular.snakeCase;
     const importMarker = '// ══════ RIVERFLOW_ROUTE_IMPORTS ══════';
-    const routeMarker = '// ══════ RIVERFLOW_ROUTE_DEFINITIONS ══════';
+    const routeMarker = '// ══════ RIVERFLOW_ROUTES ══════';
 
     // Add import
     final importLine = "import 'package:$projectName/features/$moduleName/"
@@ -42,24 +42,18 @@ class RouteRegistrar {
       }
     }
 
-    // Add route class
-    final routeClass = '''
-@TypedGoRoute<${className}Route>(path: '/$moduleName')
-class ${className}Route extends GoRouteData {
-  const ${className}Route();
-
-  @override
-  Widget build(BuildContext context, GoRouterState state) {
-    return const ${className}View();
-  }
-}
-''';
+    // Add route entry
+    final routeEntry = '''GoRoute(
+        path: '/$moduleName',
+        name: '$moduleName',
+        builder: (context, state) => const ${className}View(),
+      ),''';
 
     if (content.contains(routeMarker) &&
-        !content.contains('${className}Route')) {
+        !content.contains("path: '/$moduleName'")) {
       content = content.replaceFirst(
         routeMarker,
-        '$routeClass\n$routeMarker',
+        '$routeEntry\n      $routeMarker',
       );
     }
 
@@ -81,7 +75,6 @@ class ${className}Route extends GoRouteData {
     if (!routerFile.existsSync()) return;
 
     var content = routerFile.readAsStringSync();
-    final className = moduleName.singular.pascalCase;
     final snakeName = moduleName.singular.snakeCase;
 
     // Remove import
@@ -89,13 +82,12 @@ class ${className}Route extends GoRouteData {
         "presentation/views/${snakeName}_view.dart';\n";
     content = content.replaceAll(importLine, '');
 
-    // Remove route class
+    // Remove route entry
     final routePattern = RegExp(
-      '@TypedGoRoute<${className}Route>\\(path: \'/$moduleName\'\\)\n'
-      'class ${className}Route extends GoRouteData \\{[^}]*\n'
-      '  @override\n'
-      '  Widget build\\(BuildContext context, GoRouterState state\\)'
-      ' \\{[^}]*\\}\n\\}\n*',
+      r"GoRoute\(\s*path: '/" +
+          moduleName +
+          r"'.*?\),\s*",
+      dotAll: true,
     );
     content = content.replaceAll(routePattern, '');
 

@@ -15,6 +15,7 @@ import 'package:riverflow_cli/src/templates/project/local_storage_template.dart'
 import 'package:riverflow_cli/src/templates/project/main_template.dart';
 import 'package:riverflow_cli/src/templates/project/print_log_template.dart';
 import 'package:riverflow_cli/src/templates/project/pubspec_template.dart';
+import 'package:riverflow_cli/src/templates/project/widget_test_template.dart';
 import 'package:riverflow_cli/src/utils/file_utils.dart';
 import 'package:riverflow_cli/src/utils/logger.dart';
 
@@ -163,31 +164,15 @@ class ProjectGenerator {
           homeViewTemplate(name),
       'lib/features/home/presentation/viewmodels/home_viewmodel.dart':
           homeViewmodelTemplate(),
+
+      // Test
+      'test/widget_test.dart': widgetTestTemplate(name),
     };
 
     for (final entry in files.entries) {
       await FileUtils.createFile(
         filePath: p.join(projectDir, entry.key),
         content: entry.value,
-        logger: logger,
-        overwrite: true,
-        dryRun: dryRun,
-      );
-    }
-
-    // Add .gitkeep to empty directories
-    final emptyDirs = [
-      'assets/images',
-      'assets/icons',
-      'assets/fonts',
-      'lib/shared/widgets',
-      'lib/shared/models',
-    ];
-
-    for (final dir in emptyDirs) {
-      await FileUtils.createFile(
-        filePath: p.join(projectDir, dir, '.gitkeep'),
-        content: '',
         logger: logger,
         overwrite: true,
         dryRun: dryRun,

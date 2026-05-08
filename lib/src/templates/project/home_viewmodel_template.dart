@@ -1,35 +1,49 @@
 /// Returns the home viewmodel content for the default home module.
+/// Uses manual Riverpod Notifier — no code generation needed.
 String homeViewmodelTemplate() => r'''
-import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-part 'home_viewmodel.freezed.dart';
-part 'home_viewmodel.g.dart';
+// ── State ────────────────────────────────────────────────────────────────────
 
-@freezed
-sealed class HomeState with _$HomeState {
-  const factory HomeState.initial() = _Initial;
-  const factory HomeState.loading() = _Loading;
-  const factory HomeState.loaded({required dynamic data}) = _Loaded;
-  const factory HomeState.error({required String message}) = _Error;
+sealed class HomeState {
+  const HomeState();
 }
 
-@riverpod
-class HomeViewModel extends _$HomeViewModel {
+class HomeInitial extends HomeState {
+  const HomeInitial();
+}
+
+class HomeLoading extends HomeState {
+  const HomeLoading();
+}
+
+class HomeLoaded extends HomeState {
+  const HomeLoaded({required this.data});
+  final dynamic data;
+}
+
+class HomeError extends HomeState {
+  const HomeError({required this.message});
+  final String message;
+}
+
+// ── ViewModel ────────────────────────────────────────────────────────────────
+
+class HomeViewModel extends Notifier<HomeState> {
   @override
-  HomeState build() {
-    return const HomeState.initial();
-  }
+  HomeState build() => const HomeInitial();
 
   Future<void> loadData() async {
-    state = const HomeState.loading();
+    state = const HomeLoading();
     try {
-      // TODO: Inject use case and fetch data
       await Future<void>.delayed(const Duration(seconds: 1));
-      state = const HomeState.loaded(data: 'Welcome to Riverflow!');
+      state = const HomeLoaded(data: 'Welcome to Riverflow!');
     } on Exception catch (e) {
-      state = HomeState.error(message: e.toString());
+      state = HomeError(message: e.toString());
     }
   }
 }
+
+final homeViewModelProvider =
+    NotifierProvider<HomeViewModel, HomeState>(HomeViewModel.new);
 ''';
