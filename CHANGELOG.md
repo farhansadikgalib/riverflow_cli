@@ -22,6 +22,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `build_runner` now always runs after code generation (no config check).
 - Post-creation message simplified to `cd <name>` + `flutter run`.
 
+### Fixed
+
+- Added `example/example.dart` for pub.dev scoring.
+
 ## [0.1.1] - 2026-05-08
 
 ### Added
