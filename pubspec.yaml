@@ -2,10 +2,10 @@ name: riverflow_cli
 description: >-
   A modern Flutter scaffolding CLI tool for Riverpod, Clean Architecture,
   Freezed, Go Router, and MVVM pattern.
-version: 0.1.0
-homepage: https://github.com/riverflow-cli/riverflow_cli
-repository: https://github.com/riverflow-cli/riverflow_cli
-issue_tracker: https://github.com/riverflow-cli/riverflow_cli/issues
+version: 0.1.1
+homepage: https://github.com/farhansadikgalib/riverflow_cli
+repository: https://github.com/farhansadikgalib/riverflow_cli
+issue_tracker: https://github.com/farhansadikgalib/riverflow_cli/issues
 
 environment:
   sdk: ">=3.4.0 <4.0.0"

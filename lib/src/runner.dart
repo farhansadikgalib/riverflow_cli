@@ -12,15 +12,26 @@ import 'package:riverflow_cli/src/commands/watch_command.dart';
 import 'package:riverflow_cli/src/utils/logger.dart';
 import 'package:riverflow_cli/src/version.dart';
 
-/// Exit codes for the CLI.
+/// Standard exit codes for CLI operations.
 class ExitCode {
+  /// The command completed successfully.
   static const success = 0;
+
+  /// The command was used incorrectly (e.g. wrong arguments).
   static const usage = 64;
+
+  /// An internal software error occurred.
   static const software = 70;
 }
 
 /// The Riverflow CLI command runner.
+///
+/// Registers all available commands and handles top-level flags
+/// like `--version` and `--verbose`.
 class RiverflowCommandRunner extends CommandRunner<int> {
+  /// Creates a new [RiverflowCommandRunner].
+  ///
+  /// Optionally accepts a [logger] and [pubUpdater] for testing.
   RiverflowCommandRunner({
     CliLogger? logger,
     PubUpdater? pubUpdater,
