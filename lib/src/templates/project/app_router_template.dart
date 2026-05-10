@@ -1,7 +1,6 @@
 /// Returns the app_router.dart content for a new Flutter project.
 /// Uses manual GoRouter provider — no code generation needed.
 String appRouterTemplate(String projectName) => '''
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:$projectName/app/routes.dart';

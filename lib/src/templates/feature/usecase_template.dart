@@ -9,7 +9,6 @@ String usecaseTemplate({
   final repoFile = moduleName.singular.snakeCase;
   final entityFile = moduleName.singular.snakeCase;
   return '''
-import 'package:dartz/dartz.dart';
 import 'package:$projectName/features/$moduleName/domain/entities/$entityFile.dart';
 import 'package:$projectName/features/$moduleName/domain/repositories/${repoFile}_repository.dart';
 import 'package:$projectName/core/errors/failure.dart';
@@ -19,7 +18,7 @@ class Get${className}sUseCase {
 
   final ${className}Repository _repository;
 
-  Future<Either<Failure, List<$className>>> call() {
+  Future<(List<$className>?, Failure?)> call() {
     return _repository.getAll();
   }
 }
@@ -29,7 +28,7 @@ class Get${className}ByIdUseCase {
 
   final ${className}Repository _repository;
 
-  Future<Either<Failure, $className>> call(String id) {
+  Future<($className?, Failure?)> call(String id) {
     return _repository.getById(id);
   }
 }

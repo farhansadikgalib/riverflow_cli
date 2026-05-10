@@ -7,13 +7,11 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../constants/app_constants.dart';
 import '../utils/print_log.dart';
-import 'api_end_points.dart';
 
 part 'api_client.g.dart';
 
@@ -348,7 +346,7 @@ class ApiClient {
 
       printLog('Attempting token refresh…');
       final res = await _dio.post(
-        ApiEndPoints.refresh,
+        'auth/refresh', // TODO: update with your refresh endpoint
         options: Options(
           headers: {
             'Authorization': bearer,

@@ -8,7 +8,6 @@ String repositoryImplTemplate({
   final className = moduleName.singular.pascalCase;
   final snakeName = moduleName.singular.snakeCase;
   return '''
-import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:$projectName/features/$moduleName/data/datasources/${snakeName}_remote_datasource.dart';
 import 'package:$projectName/features/$moduleName/domain/entities/$snakeName.dart';
@@ -21,83 +20,73 @@ class ${className}RepositoryImpl implements ${className}Repository {
   final ${className}RemoteDatasource _remoteDatasource;
 
   @override
-  Future<Either<Failure, List<$className>>> getAll() async {
+  Future<(List<$className>?, Failure?)> getAll() async {
     try {
       final models = await _remoteDatasource.getAll();
-      return Right(models.map((m) => m.toEntity()).toList());
+      return (models.map((m) => m.toEntity()).toList(), null);
     } on DioException catch (e) {
-      return Left(
-        Failure.server(
-          message: e.message ?? 'Server error',
-          statusCode: e.response?.statusCode,
-        ),
-      );
+      return (null, Failure.server(
+        message: e.message ?? 'Server error',
+        statusCode: e.response?.statusCode,
+      ));
     }
   }
 
   @override
-  Future<Either<Failure, $className>> getById(String id) async {
+  Future<($className?, Failure?)> getById(String id) async {
     try {
       final model = await _remoteDatasource.getById(id);
-      return Right(model.toEntity());
+      return (model.toEntity(), null);
     } on DioException catch (e) {
-      return Left(
-        Failure.server(
-          message: e.message ?? 'Server error',
-          statusCode: e.response?.statusCode,
-        ),
-      );
+      return (null, Failure.server(
+        message: e.message ?? 'Server error',
+        statusCode: e.response?.statusCode,
+      ));
     }
   }
 
   @override
-  Future<Either<Failure, $className>> create($className entity) async {
+  Future<($className?, Failure?)> create($className entity) async {
     try {
       final model = await _remoteDatasource.create({
         'name': entity.name,
         'description': entity.description,
       });
-      return Right(model.toEntity());
+      return (model.toEntity(), null);
     } on DioException catch (e) {
-      return Left(
-        Failure.server(
-          message: e.message ?? 'Server error',
-          statusCode: e.response?.statusCode,
-        ),
-      );
+      return (null, Failure.server(
+        message: e.message ?? 'Server error',
+        statusCode: e.response?.statusCode,
+      ));
     }
   }
 
   @override
-  Future<Either<Failure, $className>> update($className entity) async {
+  Future<($className?, Failure?)> update($className entity) async {
     try {
       final model = await _remoteDatasource.update(entity.id, {
         'name': entity.name,
         'description': entity.description,
       });
-      return Right(model.toEntity());
+      return (model.toEntity(), null);
     } on DioException catch (e) {
-      return Left(
-        Failure.server(
-          message: e.message ?? 'Server error',
-          statusCode: e.response?.statusCode,
-        ),
-      );
+      return (null, Failure.server(
+        message: e.message ?? 'Server error',
+        statusCode: e.response?.statusCode,
+      ));
     }
   }
 
   @override
-  Future<Either<Failure, void>> delete(String id) async {
+  Future<(bool, Failure?)> delete(String id) async {
     try {
       await _remoteDatasource.delete(id);
-      return const Right(null);
+      return (true, null);
     } on DioException catch (e) {
-      return Left(
-        Failure.server(
-          message: e.message ?? 'Server error',
-          statusCode: e.response?.statusCode,
-        ),
-      );
+      return (false, Failure.server(
+        message: e.message ?? 'Server error',
+        statusCode: e.response?.statusCode,
+      ));
     }
   }
 }

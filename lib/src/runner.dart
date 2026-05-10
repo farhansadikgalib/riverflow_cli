@@ -7,6 +7,7 @@ import 'package:riverflow_cli/src/commands/init_command.dart';
 import 'package:riverflow_cli/src/commands/install_command.dart';
 import 'package:riverflow_cli/src/commands/remove_command.dart';
 import 'package:riverflow_cli/src/commands/sort_command.dart';
+import 'package:riverflow_cli/src/commands/test_command.dart';
 import 'package:riverflow_cli/src/commands/update_command.dart';
 import 'package:riverflow_cli/src/commands/watch_command.dart';
 import 'package:riverflow_cli/src/utils/logger.dart';
@@ -58,6 +59,7 @@ class RiverflowCommandRunner extends CommandRunner<int> {
     addCommand(SortCommand(logger: _logger));
     addCommand(InstallCommand(logger: _logger));
     addCommand(RemoveCommand(logger: _logger));
+    addCommand(TestCommand(logger: _logger));
     addCommand(UpdateCommand(logger: _logger, pubUpdater: _pubUpdater));
     addCommand(WatchCommand(logger: _logger));
   }

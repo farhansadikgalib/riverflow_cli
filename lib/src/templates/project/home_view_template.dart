@@ -18,7 +18,7 @@ class HomeView extends ConsumerWidget {
             child: Text('Welcome! Tap the button to get started.'),
           ),
         HomeLoading() => const Center(child: CircularProgressIndicator()),
-        HomeLoaded(:final data) => Center(
+        HomeLoaded() => Center(
             child: Text(
               'Hello, Riverflow!',
               style: Theme.of(context).textTheme.headlineMedium,

@@ -13,6 +13,7 @@ import 'package:riverflow_cli/src/templates/project/failure_template.dart';
 import 'package:riverflow_cli/src/templates/project/local_storage_template.dart';
 import 'package:riverflow_cli/src/templates/project/print_log_template.dart';
 import 'package:riverflow_cli/src/templates/project/routes_template.dart';
+import 'package:riverflow_cli/src/templates/project/snackbar_template.dart';
 import 'package:riverflow_cli/src/utils/file_utils.dart';
 import 'package:riverflow_cli/src/utils/logger.dart';
 import 'package:riverflow_cli/src/utils/packages.dart';
@@ -65,9 +66,7 @@ class InitCommand extends Command<int> {
       'lib/shared/widgets',
       'lib/shared/models',
       'lib/app',
-      'assets/images',
-      'assets/icons',
-      'assets/fonts',
+      'assets',
     ];
 
     for (final dir in dirs) {
@@ -92,6 +91,7 @@ class InitCommand extends Command<int> {
       p.join('lib', 'core', 'storage', 'local_storage.dart'):
           localStorageTemplate(),
       p.join('lib', 'core', 'utils', 'print_log.dart'): printLogTemplate(),
+      p.join('lib', 'core', 'utils', 'riv_snackbar.dart'): snackbarTemplate(),
       p.join('lib', 'core', 'di', 'app_providers.dart'): diTemplate(
         projectName,
       ),

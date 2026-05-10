@@ -15,6 +15,7 @@ import 'package:riverflow_cli/src/templates/project/local_storage_template.dart'
 import 'package:riverflow_cli/src/templates/project/main_template.dart';
 import 'package:riverflow_cli/src/templates/project/print_log_template.dart';
 import 'package:riverflow_cli/src/templates/project/pubspec_template.dart';
+import 'package:riverflow_cli/src/templates/project/snackbar_template.dart';
 import 'package:riverflow_cli/src/templates/project/routes_template.dart';
 import 'package:riverflow_cli/src/templates/project/widget_test_template.dart';
 import 'package:riverflow_cli/src/utils/file_utils.dart';
@@ -113,9 +114,7 @@ class ProjectGenerator {
       'lib/app',
 
       // assets
-      'assets/images',
-      'assets/icons',
-      'assets/fonts',
+      'assets',
     ];
 
     for (final dir in dirs) {
@@ -155,6 +154,7 @@ class ProjectGenerator {
 
       // Core — utils
       'lib/core/utils/print_log.dart': printLogTemplate(),
+      'lib/core/utils/riv_snackbar.dart': snackbarTemplate(),
 
       // Core — di
       'lib/core/di/app_providers.dart': diTemplate(name),

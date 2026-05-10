@@ -11,8 +11,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_localizations:
-    sdk: flutter
   cupertino_icons: ^1.0.9
 
   # State Management
@@ -28,16 +26,12 @@ dependencies:
 
   # Storage
   flutter_secure_storage: ^10.1.0
-  shared_preferences: ^2.5.5
 
   # Environment
   flutter_dotenv: ^6.0.1
 
   # Logging
   logger: ^2.7.0
-
-  # Functional Programming
-  dartz: ^0.10.1
 
   # Code Generation Annotations
   freezed_annotation: ^3.1.0
@@ -49,24 +43,16 @@ dev_dependencies:
   # Code Generation
   build_runner: ^2.15.0
   freezed: ^3.2.5
-  json_serializable: ^6.13.2
+  json_serializable: ^6.12.0
   riverpod_generator: ^4.0.3
 
   # Linting
-  riverpod_lint: ^3.1.3
-  custom_lint: ^0.8.1
   flutter_lints: ^6.0.0
-
-  # Testing
-  mocktail: ^1.0.5
 
 flutter:
   uses-material-design: true
-  generate: true
 
   assets:
     - .env
-    - assets/images/
-    - assets/icons/
-    - assets/fonts/
+    - assets/
 ''';

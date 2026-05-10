@@ -5,6 +5,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.6] - 2026-05-10
+
+### Added
+
+- `riv test` command — auto-installs `mocktail` on first run, then executes `flutter test`.
+- `riv generate locales` now auto-adds `flutter_localizations` and `generate: true` to pubspec when needed.
+- `Riv.snackbar()` utility — reusable snackbar with `title`, `subtitle`, and `color` parameters.
+
+### Changed
+
+- App theme simplified to light/dark mode with transparent status bar and `SystemUiOverlayStyle`.
+- Replaced `dartz` `Either<Failure, T>` with Dart 3 records `(T?, Failure?)` — no external dependency needed.
+- Updated all `@riverpod` function providers to use `Ref` instead of generated ref types (riverpod_annotation 4.x compatibility).
+- `LocalStorage` now uses only `FlutterSecureStorage` — removed `SharedPreferences` dependency.
+- Assets directory simplified to a single `assets/` folder.
+
+### Removed
+
+- `shared_preferences` — unnecessary with `flutter_secure_storage` handling all storage.
+- `dartz` — replaced with Dart 3 records for error handling.
+- `mocktail` from default pubspec — now installed on-demand via `riv test`.
+- `flutter_localizations` from default pubspec — now installed on-demand via `riv generate locales`.
+- `riverpod_lint` and `custom_lint` — eliminated analyzer version conflicts.
+- `json_annotation` and `go_router_builder` — unused in generated code.
+
+### Fixed
+
+- Resolved `analyzer` version conflict between `custom_lint ^0.8.1` and `json_serializable ^6.12.0`.
+- Fixed unused imports and variables in generated project templates.
+- Generated project now passes `flutter analyze` with zero issues.
+
 ## [0.1.5] - 2026-05-10
 
 ### Added

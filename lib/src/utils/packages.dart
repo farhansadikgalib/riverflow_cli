@@ -6,10 +6,8 @@ const List<String> requiredPackages = [
   'dio',
   'connectivity_plus',
   'flutter_secure_storage',
-  'shared_preferences',
   'flutter_dotenv',
   'logger',
-  'dartz',
   'freezed_annotation',
 ];
 
@@ -19,8 +17,5 @@ const List<String> requiredDevPackages = [
   'freezed',
   'json_serializable',
   'riverpod_generator',
-  'riverpod_lint',
-  'custom_lint',
   'flutter_lints',
-  'mocktail',
 ];

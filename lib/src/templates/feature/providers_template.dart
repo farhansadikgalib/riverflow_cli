@@ -21,9 +21,7 @@ part '${snakeName}_providers.g.dart';
 // ═══ Datasource ═══
 
 @riverpod
-${className}RemoteDatasource ${moduleName.singular.camelCase}RemoteDatasource(
-  ${className}RemoteDatasourceRef ref,
-) {
+${className}RemoteDatasource ${moduleName.singular.camelCase}RemoteDatasource(Ref ref) {
   final client = ref.watch(apiClientProvider);
   return ${className}RemoteDatasource(client);
 }
@@ -31,9 +29,7 @@ ${className}RemoteDatasource ${moduleName.singular.camelCase}RemoteDatasource(
 // ═══ Repository ═══
 
 @riverpod
-${className}Repository ${moduleName.singular.camelCase}Repository(
-  ${className}RepositoryRef ref,
-) {
+${className}Repository ${moduleName.singular.camelCase}Repository(Ref ref) {
   final datasource = ref.watch(${moduleName.singular.camelCase}RemoteDatasourceProvider);
   return ${className}RepositoryImpl(datasource);
 }
@@ -41,17 +37,13 @@ ${className}Repository ${moduleName.singular.camelCase}Repository(
 // ═══ Use Cases ═══
 
 @riverpod
-Get${className}sUseCase get${className}sUseCase(
-  Get${className}sUseCaseRef ref,
-) {
+Get${className}sUseCase get${className}sUseCase(Ref ref) {
   final repository = ref.watch(${moduleName.singular.camelCase}RepositoryProvider);
   return Get${className}sUseCase(repository);
 }
 
 @riverpod
-Get${className}ByIdUseCase get${className}ByIdUseCase(
-  Get${className}ByIdUseCaseRef ref,
-) {
+Get${className}ByIdUseCase get${className}ByIdUseCase(Ref ref) {
   final repository = ref.watch(${moduleName.singular.camelCase}RepositoryProvider);
   return Get${className}ByIdUseCase(repository);
 }

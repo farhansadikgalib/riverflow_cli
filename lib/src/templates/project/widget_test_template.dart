@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:$name/app/app_router.dart';
 import 'package:$name/core/theme/app_theme.dart';
 
 void main() {

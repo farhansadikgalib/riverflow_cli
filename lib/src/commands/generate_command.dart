@@ -112,6 +112,34 @@ class GenerateCommand extends Command<int> {
       return ExitCode.success;
     }
 
+    // Ensure flutter_localizations is in pubspec
+    final pubspecFile = File('pubspec.yaml');
+    final pubspecContent = pubspecFile.readAsStringSync();
+
+    if (!pubspecContent.contains('flutter_localizations:')) {
+      final depsProgress =
+          _logger.progress('Adding flutter_localizations');
+      final depsResult = await Process.run(
+        'flutter',
+        ['pub', 'add', 'flutter_localizations', '--sdk=flutter'],
+        runInShell: true,
+      );
+      if (depsResult.exitCode != 0) {
+        depsProgress.fail('Failed to add flutter_localizations');
+        _logger.err(depsResult.stderr.toString());
+        return ExitCode.software;
+      }
+      depsProgress.complete('flutter_localizations added!');
+    }
+
+    // Ensure generate: true is in pubspec
+    final currentContent = pubspecFile.readAsStringSync();
+    if (!currentContent.contains('generate: true')) {
+      final updated =
+          currentContent.replaceFirst('flutter:', 'flutter:\n  generate: true');
+      pubspecFile.writeAsStringSync(updated);
+    }
+
     final progress = _logger.progress('Generating locales');
 
     final result = await Process.run(

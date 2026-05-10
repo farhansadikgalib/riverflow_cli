@@ -1,29 +1,61 @@
 /// Returns the app_theme.dart content for a new Flutter project.
-String appThemeTemplate() => '''
+String appThemeTemplate() => r'''
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 /// Application theme configuration.
 class AppTheme {
   AppTheme._();
 
-  static ThemeData get light => ThemeData(
-        useMaterial3: true,
-        brightness: Brightness.light,
-        colorSchemeSeed: Colors.blue,
-        appBarTheme: const AppBarTheme(
-          centerTitle: true,
-          elevation: 0,
-        ),
-      );
+  // ── Brand seed color ────────────────────────────────────────────────
+  static const Color _seedColor = Color(0xFF1A73E8);
 
-  static ThemeData get dark => ThemeData(
-        useMaterial3: true,
-        brightness: Brightness.dark,
-        colorSchemeSeed: Colors.blue,
-        appBarTheme: const AppBarTheme(
-          centerTitle: true,
-          elevation: 0,
+  // ── Light theme ─────────────────────────────────────────────────────
+  static ThemeData get light {
+    final scheme = ColorScheme.fromSeed(
+      seedColor: _seedColor,
+      brightness: Brightness.light,
+    );
+    return ThemeData(
+      useMaterial3: true,
+      colorScheme: scheme,
+      scaffoldBackgroundColor: scheme.surface,
+      appBarTheme: AppBarTheme(
+        centerTitle: true,
+        elevation: 0,
+        backgroundColor: scheme.surface,
+        foregroundColor: scheme.onSurface,
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Brightness.dark,
+          statusBarBrightness: Brightness.light,
         ),
-      );
+      ),
+    );
+  }
+
+  // ── Dark theme ──────────────────────────────────────────────────────
+  static ThemeData get dark {
+    final scheme = ColorScheme.fromSeed(
+      seedColor: _seedColor,
+      brightness: Brightness.dark,
+    );
+    return ThemeData(
+      useMaterial3: true,
+      colorScheme: scheme,
+      scaffoldBackgroundColor: scheme.surface,
+      appBarTheme: AppBarTheme(
+        centerTitle: true,
+        elevation: 0,
+        backgroundColor: scheme.surface,
+        foregroundColor: scheme.onSurface,
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Brightness.light,
+          statusBarBrightness: Brightness.dark,
+        ),
+      ),
+    );
+  }
 }
 ''';

@@ -8,8 +8,6 @@ linter:
     lines_longer_than_80_chars: false
 
 analyzer:
-  plugins:
-    - custom_lint
   exclude:
     - "**/*.g.dart"
     - "**/*.freezed.dart"
