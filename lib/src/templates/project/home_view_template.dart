@@ -39,11 +39,6 @@ class HomeView extends ConsumerWidget {
             ),
           ),
       },
-      floatingActionButton: FloatingActionButton(
-        onPressed: () =>
-            ref.read(homeViewModelProvider.notifier).loadData(),
-        child: const Icon(Icons.refresh),
-      ),
     );
   }
 }

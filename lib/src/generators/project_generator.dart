@@ -15,6 +15,7 @@ import 'package:riverflow_cli/src/templates/project/local_storage_template.dart'
 import 'package:riverflow_cli/src/templates/project/main_template.dart';
 import 'package:riverflow_cli/src/templates/project/print_log_template.dart';
 import 'package:riverflow_cli/src/templates/project/pubspec_template.dart';
+import 'package:riverflow_cli/src/templates/project/routes_template.dart';
 import 'package:riverflow_cli/src/templates/project/widget_test_template.dart';
 import 'package:riverflow_cli/src/utils/file_utils.dart';
 import 'package:riverflow_cli/src/utils/logger.dart';
@@ -72,6 +73,7 @@ class ProjectGenerator {
           name,
         ],
         workingDirectory: Directory.current.path,
+        runInShell: true,
       );
       if (result.exitCode != 0) {
         progress.fail('Failed to create Flutter project');
@@ -136,6 +138,7 @@ class ProjectGenerator {
       // App
       'lib/main.dart': mainTemplate(name),
       'lib/app/app_router.dart': appRouterTemplate(name),
+      'lib/app/routes.dart': routesTemplate(),
 
       // Core — constants
       'lib/core/constants/app_constants.dart': appConstantsTemplate(),
@@ -188,6 +191,7 @@ class ProjectGenerator {
         'flutter',
         ['pub', 'get'],
         workingDirectory: projectDir,
+        runInShell: true,
       );
       if (pubGetResult.exitCode != 0) {
         pubGetProgress.fail('flutter pub get failed');
@@ -204,6 +208,7 @@ class ProjectGenerator {
         'dart',
         ['run', 'build_runner', 'build', '--delete-conflicting-outputs'],
         workingDirectory: projectDir,
+        runInShell: true,
       );
       if (buildResult.exitCode != 0) {
         buildProgress.fail('build_runner failed');

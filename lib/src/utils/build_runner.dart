@@ -15,6 +15,7 @@ class BuildRunnerHelper {
     final result = await Process.run(
       'dart',
       ['run', 'build_runner', 'build', '--delete-conflicting-outputs'],
+      runInShell: true,
     );
 
     if (result.exitCode != 0) {

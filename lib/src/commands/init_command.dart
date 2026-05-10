@@ -12,8 +12,10 @@ import 'package:riverflow_cli/src/templates/project/di_template.dart';
 import 'package:riverflow_cli/src/templates/project/failure_template.dart';
 import 'package:riverflow_cli/src/templates/project/local_storage_template.dart';
 import 'package:riverflow_cli/src/templates/project/print_log_template.dart';
+import 'package:riverflow_cli/src/templates/project/routes_template.dart';
 import 'package:riverflow_cli/src/utils/file_utils.dart';
 import 'package:riverflow_cli/src/utils/logger.dart';
+import 'package:riverflow_cli/src/utils/packages.dart';
 
 /// Converts an existing Flutter project to Riverflow structure.
 ///
@@ -79,6 +81,7 @@ class InitCommand extends Command<int> {
     // Create core files if they don't exist
     final files = <String, String>{
       p.join('lib', 'app', 'app_router.dart'): appRouterTemplate(projectName),
+      p.join('lib', 'app', 'routes.dart'): routesTemplate(),
       p.join('lib', 'core', 'constants', 'app_constants.dart'):
           appConstantsTemplate(),
       p.join('lib', 'core', 'errors', 'failure.dart'): failureTemplate(),
@@ -108,13 +111,41 @@ class InitCommand extends Command<int> {
 
     progress.complete('Riverflow structure initialized!');
 
+    // Install required packages
+    if (!dryRun) {
+      final depsProgress = _logger.progress('Installing dependencies');
+      final depsResult = await Process.run(
+        'flutter',
+        ['pub', 'add', ...requiredPackages],
+        runInShell: true,
+      );
+      if (depsResult.exitCode != 0) {
+        depsProgress.fail('Failed to install dependencies');
+        _logger.err(depsResult.stderr.toString());
+      } else {
+        depsProgress.complete('Dependencies installed!');
+      }
+
+      final devDepsProgress = _logger.progress('Installing dev dependencies');
+      final devDepsResult = await Process.run(
+        'flutter',
+        ['pub', 'add', '--dev', ...requiredDevPackages],
+        runInShell: true,
+      );
+      if (devDepsResult.exitCode != 0) {
+        devDepsProgress.fail('Failed to install dev dependencies');
+        _logger.err(devDepsResult.stderr.toString());
+      } else {
+        devDepsProgress.complete('Dev dependencies installed!');
+      }
+    }
+
     _logger
       ..info('')
       ..info('Your project has been restructured. Next steps:')
       ..info('  1. Move existing features into lib/features/')
-      ..info('  2. Run: flutter pub get')
       ..info(
-        '  3. Run: dart run build_runner build '
+        '  2. Run: dart run build_runner build '
         '--delete-conflicting-outputs',
       );
 

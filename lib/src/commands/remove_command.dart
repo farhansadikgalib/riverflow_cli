@@ -37,6 +37,7 @@ class RemoveCommand extends Command<int> {
     final result = await Process.run(
       'flutter',
       ['pub', 'remove', ...packages],
+      runInShell: true,
     );
 
     if (result.exitCode != 0) {

@@ -40,11 +40,6 @@ class ${className}View extends ConsumerWidget {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () =>
-            ref.read(${name.camelCase}ViewModelProvider.notifier).loadData(),
-        child: const Icon(Icons.refresh),
-      ),
     );
   }
 }

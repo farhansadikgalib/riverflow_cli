@@ -4,6 +4,7 @@ String appRouterTemplate(String projectName) => '''
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:$projectName/app/routes.dart';
 import 'package:$projectName/features/home/presentation/views/home_view.dart';
 
 // ═══ Route Definitions ═══
@@ -14,11 +15,11 @@ import 'package:$projectName/features/home/presentation/views/home_view.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
-    initialLocation: '/',
+    initialLocation: Routes.home,
     debugLogDiagnostics: true,
     routes: [
       GoRoute(
-        path: '/',
+        path: Routes.home,
         name: 'home',
         builder: (context, state) => const HomeView(),
       ),

@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.5] - 2026-05-10
+
+### Added
+
+- `lib/app/routes.dart` — centralised `Routes` class with named constants for type-safe navigation (`context.go(Routes.home)` instead of hard-coded strings).
+- `riv create page` and `riv delete page` now auto-register/unregister route names in `Routes`.
+- `riv init` now auto-installs all required dependencies and dev dependencies into `pubspec.yaml`.
+
+### Changed
+
+- All generated views no longer include a `FloatingActionButton`.
+- API endpoints template now ships fully commented out as reference examples.
+- Updated all packages in the pubspec template to latest stable versions.
+
+### Removed
+
+- `json_annotation` from dependencies (available transitively via `freezed_annotation`).
+- `go_router_builder` from dev dependencies (unused — routes use manual `GoRoute` entries).
+
+## [0.1.4] - 2026-05-10
+
+### Fixed
+
+- Windows `ProcessException: The system cannot find the file specified` — added `runInShell: true` to all process calls so `flutter.bat` and `dart.bat` are resolved correctly via the system shell.
+
 ## [0.1.3] - 2026-05-08
 
 ### Fixed

@@ -37,6 +37,7 @@ class WatchCommand extends Command<int> {
     final process = await Process.start(
       'dart',
       ['run', 'build_runner', 'watch', '--delete-conflicting-outputs'],
+      runInShell: true,
     );
 
     // Forward stdout and stderr to the terminal

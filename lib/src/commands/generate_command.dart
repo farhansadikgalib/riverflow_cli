@@ -117,6 +117,7 @@ class GenerateCommand extends Command<int> {
     final result = await Process.run(
       'flutter',
       ['gen-l10n', '--arb-dir=$arbPath'],
+      runInShell: true,
     );
 
     if (result.exitCode != 0) {

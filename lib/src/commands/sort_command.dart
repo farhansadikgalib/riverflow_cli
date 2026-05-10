@@ -26,6 +26,7 @@ class SortCommand extends Command<int> {
     final result = await Process.run(
       'dart',
       ['fix', '--apply', '--code=directives_ordering'],
+      runInShell: true,
     );
 
     if (result.exitCode != 0) {
@@ -33,6 +34,7 @@ class SortCommand extends Command<int> {
       final formatResult = await Process.run(
         'dart',
         ['format', '.'],
+        runInShell: true,
       );
       if (formatResult.exitCode != 0) {
         progress.fail('Failed to sort imports');

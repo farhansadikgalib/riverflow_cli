@@ -44,7 +44,7 @@ class InstallCommand extends Command<int> {
     );
 
     final args = ['pub', 'add', if (isDev) '--dev', ...packages];
-    final result = await Process.run('flutter', args);
+    final result = await Process.run('flutter', args, runInShell: true);
 
     if (result.exitCode != 0) {
       progress.fail('Failed to install packages');

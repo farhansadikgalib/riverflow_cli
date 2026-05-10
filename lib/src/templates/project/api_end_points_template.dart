@@ -9,14 +9,14 @@ class ApiEndPoints {
   ApiEndPoints._();
 
   // ── Auth ─────────────────────────────────────────────────────────────────
-  static const String login = 'auth/login';
-  static const String register = 'auth/register';
-  static const String refresh = 'auth/refresh';
-  static const String logout = 'auth/logout';
+  // static const String login = 'auth/login';
+  // static const String register = 'auth/register';
+  // static const String refresh = 'auth/refresh';
+  // static const String logout = 'auth/logout';
 
   // ── User ─────────────────────────────────────────────────────────────────
-  static const String profile = 'user/profile';
-  static String userById(String id) => 'user/$id';
+  // static const String profile = 'user/profile';
+  // static String userById(String id) => 'user/$id';
 
   // ── General ──────────────────────────────────────────────────────────────
   // Add your project-specific endpoints below:
