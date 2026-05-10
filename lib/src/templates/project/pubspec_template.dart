@@ -30,6 +30,9 @@ dependencies:
   # Environment
   flutter_dotenv: ^6.0.1
 
+  # Responsive
+  flutter_screenutil: ^5.9.3
+
   # Logging
   logger: ^2.7.0
 

@@ -13,7 +13,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part '$fileName.freezed.dart';
 
 @freezed
-class $className with _\$$className {
+sealed class $className with _\$$className {
   const factory $className({
     required String id,
     required String name,

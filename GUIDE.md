@@ -10,40 +10,22 @@ A step-by-step guide for building Flutter apps with Riverflow CLI.
 riv create project
 ```
 
-The CLI will ask:
-
-```
-  What is the name of the project?: my_shop
-  What is your company's domain?  Example: com.yourcompany (com.example): com.mycompany
-```
-
-This creates a full Flutter project with Clean Architecture, Riverpod, Freezed, Go Router, and a default home module.
-
-After creation:
+The CLI will ask for a project name and company domain, then scaffolds a full Flutter project with Clean Architecture, Riverpod, Freezed, Go Router, ScreenUtil, and a default home module.
 
 ```bash
 cd my_shop
-flutter pub get
-dart run build_runner build --delete-conflicting-outputs
-```
-
-Or start watch mode so code generation runs automatically:
-
-```bash
-riv watch
+flutter run
 ```
 
 ---
 
 ## 2. Create a Feature Module
 
-Let's say you need a products feature:
-
 ```bash
 riv create page:products
 ```
 
-This generates the entire module:
+This generates the entire module and auto-registers the route:
 
 ```
 lib/features/products/
@@ -62,598 +44,373 @@ lib/features/products/
     └── widgets/
 ```
 
-The route is auto-registered in `app_router.dart`. Run build_runner to generate the code:
-
-```bash
-dart run build_runner build --delete-conflicting-outputs
-```
-
 ---
 
-## 3. Freezed Models — How They Work
+## 3. ViewModel — Adding Methods
 
-Riverflow generates two types of Freezed classes per feature:
-
-### Entity (Domain Layer)
-
-`lib/features/products/domain/entities/product.dart`
-
-```dart
-import 'package:freezed_annotation/freezed_annotation.dart';
-
-part 'product.freezed.dart';
-
-@freezed
-class Product with _$Product {
-  const factory Product({
-    required String id,
-    required String name,
-    String? description,
-    DateTime? createdAt,
-  }) = _Product;
-}
-```
-
-This is your pure business object. No JSON, no framework imports.
-
-### Model (Data Layer)
-
-`lib/features/products/data/models/product_model.dart`
-
-```dart
-import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:my_shop/features/products/domain/entities/product.dart';
-
-part 'product_model.freezed.dart';
-part 'product_model.g.dart';
-
-@freezed
-class ProductModel with _$ProductModel {
-  const ProductModel._();
-
-  const factory ProductModel({
-    required String id,
-    required String name,
-    String? description,
-    DateTime? createdAt,
-  }) = _ProductModel;
-
-  // JSON parsing
-  factory ProductModel.fromJson(Map<String, dynamic> json) =>
-      _$ProductModelFromJson(json);
-
-  // Map to domain entity
-  Product toEntity() {
-    return Product(
-      id: id,
-      name: name,
-      description: description,
-      createdAt: createdAt,
-    );
-  }
-}
-```
-
-### Generate a Model from JSON
-
-If you have a JSON file, you can auto-generate the model:
-
-```bash
-riv generate model on products with data/product.json
-```
-
-Where `data/product.json` contains:
-
-```json
-{
-  "id": "abc123",
-  "name": "Widget Pro",
-  "price": 29.99,
-  "in_stock": true
-}
-```
-
-This infers the Dart types and creates the Freezed model automatically.
-
-### Using Freezed Models
-
-```dart
-// Create
-final product = Product(id: '1', name: 'Widget Pro');
-
-// Copy with modification
-final updated = product.copyWith(name: 'Widget Pro Max');
-
-// From JSON (model layer)
-final model = ProductModel.fromJson(jsonMap);
-final entity = model.toEntity();
-```
-
-After creating or editing any Freezed class, run:
-
-```bash
-dart run build_runner build --delete-conflicting-outputs
-```
-
----
-
-## 4. API Calls — Using the Network Layer
-
-### Setup
-
-Your base URL is configured in `.env`:
-
-```
-BASE_URL=https://api.myshop.com/v1/
-```
-
-And read by `lib/core/constants/app_constants.dart`:
-
-```dart
-static String get baseUrl => dotenv.env['BASE_URL'] ?? 'https://api.example.com/';
-```
-
-### Add Your Endpoints
-
-Edit `lib/core/network/api_end_points.dart`:
-
-```dart
-class ApiEndPoints {
-  ApiEndPoints._();
-
-  // Auth
-  static const String login = 'auth/login';
-  static const String register = 'auth/register';
-  static const String refresh = 'auth/refresh';
-
-  // Products
-  static const String products = 'products';
-  static String productById(String id) => 'products/$id';
-  static String searchProducts(String query) => 'products/search?q=$query';
-}
-```
-
-### Making API Calls in Datasource
-
-The generated datasource already uses `ApiClient`. Here's how it works:
-
-```dart
-class ProductRemoteDatasource {
-  const ProductRemoteDatasource(this._apiClient);
-
-  final ApiClient _apiClient;
-
-  // GET — fetch all products
-  Future<List<ProductModel>> getAll() async {
-    final response = await _apiClient.get(
-      ApiEndPoints.products,
-      requiresAuth: true,
-    );
-    final body = jsonDecode(response?.data?.toString() ?? '[]');
-    return (body as List)
-        .map((e) => ProductModel.fromJson(e as Map<String, dynamic>))
-        .toList();
-  }
-
-  // GET — fetch single product
-  Future<ProductModel> getById(String id) async {
-    final response = await _apiClient.get(
-      ApiEndPoints.productById(id),
-      requiresAuth: true,
-    );
-    final body = jsonDecode(response?.data?.toString() ?? '{}');
-    return ProductModel.fromJson(body as Map<String, dynamic>);
-  }
-
-  // POST — create product
-  Future<ProductModel> create(Map<String, dynamic> data) async {
-    final response = await _apiClient.post(
-      ApiEndPoints.products,
-      data: data,
-      requiresAuth: true,
-    );
-    final body = jsonDecode(response?.data?.toString() ?? '{}');
-    return ProductModel.fromJson(body as Map<String, dynamic>);
-  }
-
-  // PUT — update product
-  Future<ProductModel> update(String id, Map<String, dynamic> data) async {
-    final response = await _apiClient.put(
-      ApiEndPoints.productById(id),
-      data: data,
-      requiresAuth: true,
-    );
-    final body = jsonDecode(response?.data?.toString() ?? '{}');
-    return ProductModel.fromJson(body as Map<String, dynamic>);
-  }
-
-  // PATCH — partial update
-  Future<ProductModel> patch(String id, Map<String, dynamic> data) async {
-    final response = await _apiClient.patch(
-      ApiEndPoints.productById(id),
-      data: data,
-      requiresAuth: true,
-    );
-    final body = jsonDecode(response?.data?.toString() ?? '{}');
-    return ProductModel.fromJson(body as Map<String, dynamic>);
-  }
-
-  // DELETE
-  Future<void> delete(String id) async {
-    await _apiClient.delete(ApiEndPoints.productById(id), requiresAuth: true);
-  }
-}
-```
-
-### Available ApiClient Methods
-
-| Method | Auth | Use for |
-|--------|------|---------|
-| `get()` | optional | Fetch data |
-| `post()` | optional | Create data, login, upload |
-| `put()` | default on | Full update |
-| `patch()` | default on | Partial update |
-| `delete()` | default on | Delete |
-| `getJson()` | optional | GET that returns `Map<String, dynamic>` |
-| `postJson()` | optional | POST that returns `Map<String, dynamic>` |
-
-Set `requiresAuth: true` to auto-attach the Bearer token from secure storage.
-
-### What ApiClient Handles Automatically
-
-- Token refresh on 401 (queues other requests until refresh completes)
-- Rate limiting on 429 (retries with exponential backoff)
-- HTML error page detection (retries up to 5 times)
-- Connection timeout and no-internet errors
-- Debug logging in development
-
----
-
-## 5. Secure Storage — Saving Tokens and Data
-
-### Saving a Token After Login
-
-```dart
-import 'package:my_shop/core/storage/local_storage.dart';
-import 'package:my_shop/core/di/app_providers.dart';
-
-// In your login method (e.g., inside auth viewmodel):
-final storage = ref.read(localStorageProvider);
-
-await storage.saveToken('Bearer eyJhbGciOiJIUzI1...');
-await storage.saveRefreshToken('refresh_token_here');
-```
-
-### Reading a Token
-
-```dart
-final token = await storage.getToken();
-if (token != null) {
-  // User is logged in
-}
-```
-
-### Clearing on Logout
-
-```dart
-await storage.clearTokens();
-```
-
-### Saving User Preferences
-
-```dart
-// Save
-await storage.setBool('dark_mode', value: true);
-await storage.setString('language', 'en');
-
-// Read
-final isDark = storage.getBool('dark_mode');           // false by default
-final lang = storage.getString('language');              // nullable
-```
-
-### Using Storage in a Provider
+The generated viewmodel is a clean shell:
 
 ```dart
 @riverpod
-class AuthViewModel extends _$AuthViewModel {
+class ProductViewModel extends _$ProductViewModel {
   @override
-  AuthState build() => const AuthState.initial();
-
-  Future<void> login(String email, String password) async {
-    state = const AuthState.loading();
-
-    final apiClient = ref.read(apiClientProvider);
-    final response = await apiClient.postJson(
-      ApiEndPoints.login,
-      data: {'email': email, 'password': password},
-    );
-
-    if (response['access_token'] != null) {
-      final storage = ref.read(localStorageProvider);
-      await storage.saveToken(response['access_token']);
-      state = const AuthState.loaded(data: 'Login successful');
-    } else {
-      state = AuthState.error(message: response['message'] ?? 'Login failed');
-    }
-  }
+  dynamic build() => null;
 }
 ```
 
----
-
-## 6. Routing — Navigate Between Pages
-
-### How Routes Work
-
-When you run `riv create page:products`, the route is auto-added to `lib/app/app_router.dart`:
+Add your own state and methods as needed:
 
 ```dart
-import 'package:my_shop/features/products/presentation/views/product_view.dart';
-
-@TypedGoRoute<ProductRoute>(path: '/products')
-class ProductRoute extends GoRouteData {
-  const ProductRoute();
-
-  @override
-  Widget build(BuildContext context, GoRouterState state) {
-    return const ProductView();
-  }
-}
-```
-
-### Navigate to a Page
-
-```dart
-// From anywhere in a widget:
-const ProductRoute().go(context);
-
-// Or push (adds to stack):
-const ProductRoute().push(context);
-```
-
-### Route with Parameters
-
-To pass data to a route, edit the generated route class:
-
-```dart
-@TypedGoRoute<ProductDetailRoute>(path: '/products/:id')
-class ProductDetailRoute extends GoRouteData {
-  const ProductDetailRoute({required this.id});
-
-  final String id;
-
-  @override
-  Widget build(BuildContext context, GoRouterState state) {
-    return ProductDetailView(id: id);
-  }
-}
-```
-
-Navigate with parameter:
-
-```dart
-ProductDetailRoute(id: '123').go(context);
-```
-
-### Go Back
-
-```dart
-context.pop();
-```
-
-After adding or editing routes, run build_runner:
-
-```bash
-dart run build_runner build --delete-conflicting-outputs
-```
-
----
-
-## 7. Full Example — Products Feature
-
-Here's a complete example of a products feature with a list view, API call, and widget.
-
-### ViewModel
-
-`lib/features/products/presentation/viewmodels/product_viewmodel.dart`
-
-```dart
-import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:my_shop/features/products/domain/entities/product.dart';
 import 'package:my_shop/features/products/presentation/providers/product_providers.dart';
 
-part 'product_viewmodel.freezed.dart';
 part 'product_viewmodel.g.dart';
 
-@freezed
-sealed class ProductState with _$ProductState {
-  const factory ProductState.initial() = _Initial;
-  const factory ProductState.loading() = _Loading;
-  const factory ProductState.loaded({required List<Product> data}) = _Loaded;
-  const factory ProductState.error({required String message}) = _Error;
+// ── State ────────────────────────────────────────────────────────────────────
+
+sealed class ProductState {
+  const ProductState();
 }
+
+class ProductInitial extends ProductState {
+  const ProductInitial();
+}
+
+class ProductLoading extends ProductState {
+  const ProductLoading();
+}
+
+class ProductLoaded extends ProductState {
+  const ProductLoaded({required this.products});
+  final List<Product> products;
+}
+
+class ProductError extends ProductState {
+  const ProductError({required this.message});
+  final String message;
+}
+
+// ── ViewModel ────────────────────────────────────────────────────────────────
 
 @riverpod
 class ProductViewModel extends _$ProductViewModel {
   @override
-  ProductState build() {
-    return const ProductState.initial();
-  }
+  ProductState build() => const ProductInitial();
 
   Future<void> loadProducts() async {
-    state = const ProductState.loading();
+    state = const ProductLoading();
     final useCase = ref.read(getProductsUseCaseProvider);
-    final result = await useCase();
-    result.fold(
-      (failure) => state = ProductState.error(message: failure.toString()),
-      (products) => state = ProductState.loaded(data: products),
-    );
+    final (data, failure) = await useCase();
+    if (failure != null) {
+      state = ProductError(message: failure.toString());
+    } else {
+      state = ProductLoaded(products: data ?? []);
+    }
   }
 
   Future<void> deleteProduct(String id) async {
-    // Optimistic update — remove from list immediately
     final current = state;
-    if (current is _Loaded) {
-      state = ProductState.loaded(
-        data: current.data.where((p) => p.id != id).toList(),
+    if (current is ProductLoaded) {
+      state = ProductLoaded(
+        products: current.products.where((p) => p.id != id).toList(),
       );
     }
   }
 }
 ```
 
-### View with Widgets
-
-`lib/features/products/presentation/views/product_view.dart`
+Then use it in the view with Dart 3 `switch`:
 
 ```dart
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:my_shop/features/products/domain/entities/product.dart';
-import 'package:my_shop/features/products/presentation/viewmodels/product_viewmodel.dart';
-import 'package:my_shop/features/products/presentation/widgets/product_card.dart';
+final state = ref.watch(productViewModelProvider);
 
-class ProductView extends ConsumerStatefulWidget {
-  const ProductView({super.key});
+body: switch (state) {
+  ProductLoading() => const Center(child: CircularProgressIndicator()),
+  ProductLoaded(:final products) => ListView.builder(
+      itemCount: products.length,
+      itemBuilder: (context, i) => Text(products[i].name),
+    ),
+  ProductError(:final message) => Center(child: Text(message)),
+  _ => const SizedBox.shrink(),
+},
+```
 
-  @override
-  ConsumerState<ProductView> createState() => _ProductViewState();
+After editing, run:
+
+```bash
+dart run build_runner build --delete-conflicting-outputs
+```
+
+---
+
+## 4. ScreenUtil — Responsive Sizing
+
+ScreenUtil is pre-configured with a `375x812` design size (iPhone ratio). Use the `.w`, `.h`, `.sp`, `.r` extensions for responsive sizing:
+
+```dart
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+Container(
+  width: 200.w,                      // responsive width
+  height: 50.h,                      // responsive height
+  padding: EdgeInsets.all(16.r),     // responsive radius/padding
+  child: Text(
+    'Hello',
+    style: TextStyle(fontSize: 16.sp), // responsive font size
+  ),
+)
+```
+
+Common patterns:
+
+```dart
+// Spacing
+SizedBox(height: 16.h)
+SizedBox(width: 8.w)
+
+// Border radius
+BorderRadius.circular(12.r)
+
+// Edge insets
+EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h)
+
+// Icon size
+Icon(Icons.home, size: 24.r)
+```
+
+---
+
+## 5. Snackbar — Riv.snackbar()
+
+Show snackbars with `Riv.snackbar()`:
+
+```dart
+import 'package:my_shop/core/utils/riv_snackbar.dart';
+
+// Success
+Riv.snackbar(
+  context,
+  title: 'Success',
+  subtitle: 'Product saved successfully.',
+  color: Colors.green,
+);
+
+// Error
+Riv.snackbar(
+  context,
+  title: 'Error',
+  subtitle: 'Something went wrong.',
+  color: Colors.red,
+);
+
+// Info (uses theme primary color by default)
+Riv.snackbar(
+  context,
+  title: 'Info',
+  subtitle: 'Your cart has been updated.',
+);
+```
+
+---
+
+## 6. Routing — Type-Safe Navigation
+
+Routes are defined in `lib/app/routes.dart`:
+
+```dart
+class Routes {
+  Routes._();
+  static const String home = '/';
+  static const String products = '/products';
+  static const String auth = '/auth';
 }
+```
 
-class _ProductViewState extends ConsumerState<ProductView> {
-  @override
-  void initState() {
-    super.initState();
-    // Load products when the page opens
-    Future.microtask(
-      () => ref.read(productViewModelProvider.notifier).loadProducts(),
-    );
-  }
+Navigate using route constants:
 
-  @override
-  Widget build(BuildContext context) {
-    final state = ref.watch(productViewModelProvider);
+```dart
+import 'package:go_router/go_router.dart';
+import 'package:my_shop/app/routes.dart';
 
-    return Scaffold(
-      appBar: AppBar(title: const Text('Products')),
-      body: state.when(
-        initial: () => const SizedBox.shrink(),
-        loading: () => const Center(child: CircularProgressIndicator()),
-        loaded: (products) => _buildProductList(products),
-        error: (message) => _buildError(message),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => ref
-            .read(productViewModelProvider.notifier)
-            .loadProducts(),
-        child: const Icon(Icons.refresh),
-      ),
-    );
-  }
+// Go (replaces current)
+context.go(Routes.products);
 
-  Widget _buildProductList(List<Product> products) {
-    if (products.isEmpty) {
-      return const Center(child: Text('No products found'));
-    }
+// Push (adds to stack)
+context.push(Routes.auth);
 
-    return RefreshIndicator(
-      onRefresh: () => ref
-          .read(productViewModelProvider.notifier)
-          .loadProducts(),
-      child: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: products.length,
-        itemBuilder: (context, index) {
-          return ProductCard(
-            product: products[index],
-            onTap: () {
-              // Navigate to detail
-              // ProductDetailRoute(id: products[index].id).go(context);
-            },
-            onDelete: () {
-              ref
-                  .read(productViewModelProvider.notifier)
-                  .deleteProduct(products[index].id);
-            },
-          );
-        },
-      ),
-    );
-  }
+// Go back
+context.pop();
+```
 
-  Widget _buildError(String message) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(Icons.error_outline, size: 48, color: Colors.red),
-          const SizedBox(height: 16),
-          Text(message, textAlign: TextAlign.center),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: () => ref
-                .read(productViewModelProvider.notifier)
-                .loadProducts(),
-            child: const Text('Retry'),
-          ),
-        ],
-      ),
-    );
+When you run `riv create page:orders`, the route is auto-registered in both `routes.dart` and `app_router.dart`.
+
+---
+
+## 7. Freezed Models
+
+### Entity (Domain Layer) — immutable business object
+
+```dart
+@freezed
+sealed class Product with _$Product {
+  const factory Product({
+    required String id,
+    required String name,
+    String? description,
+  }) = _Product;
+}
+```
+
+### Model (Data Layer) — handles JSON
+
+```dart
+@freezed
+abstract class ProductModel with _$ProductModel {
+  const ProductModel._();
+
+  const factory ProductModel({
+    required String id,
+    required String name,
+    String? description,
+  }) = _ProductModel;
+
+  factory ProductModel.fromJson(Map<String, dynamic> json) =>
+      _$ProductModelFromJson(json);
+
+  Product toEntity() => Product(id: id, name: name, description: description);
+}
+```
+
+### Generate from JSON
+
+```bash
+riv generate model on products with data/product.json
+```
+
+### Usage
+
+```dart
+final product = Product(id: '1', name: 'Widget Pro');
+final updated = product.copyWith(name: 'Widget Pro Max');
+
+final model = ProductModel.fromJson(jsonMap);
+final entity = model.toEntity();
+```
+
+---
+
+## 8. API Calls
+
+### Setup
+
+Set your base URL in `.env`:
+
+```
+BASE_URL=https://api.myshop.com/v1/
+```
+
+Uncomment endpoints in `lib/core/network/api_end_points.dart`:
+
+```dart
+class ApiEndPoints {
+  ApiEndPoints._();
+
+  static const String login = 'auth/login';
+  static const String products = 'products';
+  static String productById(String id) => 'products/$id';
+}
+```
+
+### Datasource example
+
+```dart
+Future<List<ProductModel>> getAll() async {
+  final response = await _apiClient.get(
+    '/products',
+    requiresAuth: true,
+  );
+  final body = jsonDecode(response?.data?.toString() ?? '[]');
+  return (body as List)
+      .map((e) => ProductModel.fromJson(e as Map<String, dynamic>))
+      .toList();
+}
+```
+
+### Repository — error handling with records
+
+```dart
+Future<(List<Product>?, Failure?)> getAll() async {
+  try {
+    final models = await _remoteDatasource.getAll();
+    return (models.map((m) => m.toEntity()).toList(), null);
+  } on DioException catch (e) {
+    return (null, Failure.server(
+      message: e.message ?? 'Server error',
+      statusCode: e.response?.statusCode,
+    ));
   }
 }
 ```
 
-### Reusable Widget
-
-`lib/features/products/presentation/widgets/product_card.dart`
+### Consuming in ViewModel
 
 ```dart
-import 'package:flutter/material.dart';
-import 'package:my_shop/features/products/domain/entities/product.dart';
-
-class ProductCard extends StatelessWidget {
-  const ProductCard({
-    super.key,
-    required this.product,
-    this.onTap,
-    this.onDelete,
-  });
-
-  final Product product;
-  final VoidCallback? onTap;
-  final VoidCallback? onDelete;
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: ListTile(
-        title: Text(
-          product.name,
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-        subtitle: product.description != null
-            ? Text(
-                product.description!,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              )
-            : null,
-        trailing: IconButton(
-          icon: const Icon(Icons.delete_outline, color: Colors.red),
-          onPressed: onDelete,
-        ),
-        onTap: onTap,
-      ),
-    );
-  }
+final (data, failure) = await useCase();
+if (failure != null) {
+  state = ProductError(message: failure.toString());
+} else {
+  state = ProductLoaded(products: data ?? []);
 }
 ```
 
 ---
 
-## 8. Quick Command Reference
+## 9. Secure Storage
+
+```dart
+final storage = ref.read(localStorageProvider);
+
+// Tokens
+await storage.saveToken('Bearer eyJhbG...');
+await storage.saveRefreshToken('refresh_token_here');
+final token = await storage.getToken();
+await storage.clearTokens();
+
+// Generic key-value
+await storage.write('user_id', '12345');
+final userId = await storage.read('user_id');
+await storage.delete('user_id');
+await storage.clearAll();
+```
+
+---
+
+## 10. Testing
+
+```bash
+riv test
+```
+
+This auto-installs `mocktail` on first run, then executes `flutter test`. Pass arguments through:
+
+```bash
+riv test --coverage
+```
+
+---
+
+## 11. Localization
+
+```bash
+riv generate locales lib/l10n
+```
+
+This auto-adds `flutter_localizations` and `generate: true` to your pubspec, then runs `flutter gen-l10n`.
+
+---
+
+## 12. Quick Command Reference
 
 ```bash
 # Project
@@ -680,26 +437,22 @@ riv install dio
 riv install mocktail --dev
 riv remove unused_pkg
 riv sort
+riv test
 riv update
 ```
 
 ---
 
-## 9. Build Runner Commands
-
-After any change to Freezed, Riverpod, Go Router, or JSON serializable files:
+## 13. Build Runner
 
 ```bash
 # One-time build
 dart run build_runner build --delete-conflicting-outputs
 
-# Watch mode (auto-rebuild on save)
+# Watch mode
 riv watch
-```
 
-If you get conflicts:
-
-```bash
+# Clean and rebuild
 dart run build_runner clean
 dart run build_runner build --delete-conflicting-outputs
 ```

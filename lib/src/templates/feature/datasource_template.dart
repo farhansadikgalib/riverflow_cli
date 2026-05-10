@@ -12,7 +12,6 @@ import 'dart:convert';
 
 import 'package:$projectName/features/$moduleName/data/models/${modelFile}_model.dart';
 import 'package:$projectName/core/network/api_client.dart';
-import 'package:$projectName/core/network/api_end_points.dart';
 
 class ${className}RemoteDatasource {
   const ${className}RemoteDatasource(this._apiClient);

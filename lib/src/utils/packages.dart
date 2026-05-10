@@ -6,6 +6,7 @@ const List<String> requiredPackages = [
   'dio',
   'connectivity_plus',
   'flutter_secure_storage',
+  'flutter_screenutil',
   'flutter_dotenv',
   'logger',
   'freezed_annotation',

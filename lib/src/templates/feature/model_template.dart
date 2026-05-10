@@ -15,7 +15,7 @@ part '${fileName}_model.freezed.dart';
 part '${fileName}_model.g.dart';
 
 @freezed
-class ${className}Model with _\$${className}Model {
+abstract class ${className}Model with _\$${className}Model {
   const ${className}Model._();
 
   const factory ${className}Model({

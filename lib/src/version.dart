@@ -1,2 +1,2 @@
 /// The current version of the Riverflow CLI.
-const packageVersion = '0.1.6';
+const packageVersion = '0.1.7';
